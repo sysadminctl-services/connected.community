@@ -1,34 +1,86 @@
-// Este bloque define el tipo de cliente que Prisma generará para nosotros.
 generator client {
   provider = "prisma-client-js"
 }
 
-// Este bloque define la conexión a nuestra base de datos, usando la variable del archivo .env
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// ========= AQUI EMPIEZAN NUESTROS MODELOS DE DATOS =========
+// === EDR generator ====
 
-// El modelo Usuario define la tabla 'Usuario' en la base de datos.
-model Usuario {
-  id        Int      @id @default(autoincrement()) // Llave primaria, autoincremental
-  email     String   @unique // El email debe ser único para cada usuario
-  nombre    String
-  password  String   // Aquí guardaremos la contraseña encriptada (hash)
-
-  rolId     Int      // Llave foránea para la relación con Rol
-  rol       Rol      @relation(fields: [rolId], references: [id]) // Define la relación
-
-  createdAt DateTime @default(now()) // Se guarda automáticamente en la creación
-  updatedAt DateTime @updatedAt    // Se actualiza automáticamente en cada modificación
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./ERD.png"
+  puppeteerConfig = "./puppeteer-config.json"
 }
 
-// El modelo Rol define la tabla 'Rol'
-model Rol {
-  id     Int      @id @default(autoincrement())
-  nombre String   @unique // Ej: "ADMINISTRADOR_SISTEMA", "RESIDENTE", "SEGURIDAD"
+// === Markdown Documentation generator ===
+generator markdown {
+  provider = "prisma-markdown"
+  output   = "./DOCUMENTATION.md"
+}
 
-  usuarios Usuario[] // Un rol puede tener muchos usuarios. Define la relación inversa.
+// === DATA MODELS ====
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+
+  roleId    Int
+  role      Role     @relation(fields: [roleId], references: [id])
+
+  administeredCondominium Condominium? @relation("administeredCondominium")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  users User[]
+}
+
+model Condominium {
+  id                  Int     @id @default(autoincrement())
+
+  // === General Information ===
+  name                String
+  logoUrl             String?
+  phone               String?
+
+  // === Contact Information and Location ===
+  country             String  @default("MX") 
+  state               String  
+  municipality        String  
+  neighborhood        String  
+  street              String  
+  exteriorNumber      String  
+  interiorNumber      String? 
+  postalCode          String  
+
+  // === Regional Configuration ===
+  timezone            String  @default("America/Mexico_City")
+  language            String  @default("es-MX")
+  currency            String  @default("MXN")
+
+  // === Tax Information ===
+  taxId               String  @unique 
+  fiscalRegimeCode    String  
+  
+  // === Información Bancaria (Opcional) ===
+  bankName            String?
+  bankAccountNumber   String?
+  bankClabe           String? @unique
+
+  // === Relations ===
+  // Condominium managed by One Administrator
+  administratorId     Int     @unique
+  administrator       User    @relation(name: "administeredCondominium", fields: [administratorId], references: [id])
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }

@@ -15,12 +15,12 @@ export class AuthService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-    const newUser = await this.prisma.usuario.create({
+    const newUser = await this.prisma.user.create({
       data: {
-        nombre: userData.nombre,
+        name: userData.name,
         email: userData.email,
         password: hashedPassword,
-        rolId: 1, // <-- OJO AQUÍ
+        roleId: 1, 
       },
     });
 
@@ -30,7 +30,7 @@ export class AuthService {
   }
 
   async login(loginData: any) {
-    const user = await this.prisma.usuario.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { email: loginData.email },
     });
 
@@ -47,7 +47,7 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const payload = { sub: user.id, email: user.email, rolId: user.rolId };
+    const payload = { sub: user.id, email: user.email, roleId: user.roleId };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
