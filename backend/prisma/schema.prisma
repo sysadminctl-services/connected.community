@@ -1,0 +1,34 @@
+// Este bloque define el tipo de cliente que Prisma generará para nosotros.
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Este bloque define la conexión a nuestra base de datos, usando la variable del archivo .env
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========= AQUI EMPIEZAN NUESTROS MODELOS DE DATOS =========
+
+// El modelo Usuario define la tabla 'Usuario' en la base de datos.
+model Usuario {
+  id        Int      @id @default(autoincrement()) // Llave primaria, autoincremental
+  email     String   @unique // El email debe ser único para cada usuario
+  nombre    String
+  password  String   // Aquí guardaremos la contraseña encriptada (hash)
+
+  rolId     Int      // Llave foránea para la relación con Rol
+  rol       Rol      @relation(fields: [rolId], references: [id]) // Define la relación
+
+  createdAt DateTime @default(now()) // Se guarda automáticamente en la creación
+  updatedAt DateTime @updatedAt    // Se actualiza automáticamente en cada modificación
+}
+
+// El modelo Rol define la tabla 'Rol'
+model Rol {
+  id     Int      @id @default(autoincrement())
+  nombre String   @unique // Ej: "ADMINISTRADOR_SISTEMA", "RESIDENTE", "SEGURIDAD"
+
+  usuarios Usuario[] // Un rol puede tener muchos usuarios. Define la relación inversa.
+}

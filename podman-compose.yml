@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine 
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: supersecretpassword
+      POSTGRES_DB: connected_community_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    volumes:
+      - ./backend:/usr/src/app:Z
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://admin:supersecretpassword@db:5432/connected_community_db?schema=public"
+
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/usr/src/app:Z
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -1,0 +1,44 @@
+# Archivo .gitignore
+
+# Dependencias y Logs
+# --------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archivos de Entorno
+# ¡¡¡NUNCA SUBIR ARCHIVOS .env A GIT!!!
+# Contienen secretos como contraseñas de base de datos y llaves de API.
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Salida de Compilación
+# --------------------
+dist/
+build/
+.next/
+
+# Archivos del Sistema Operativo
+# --------------------
+.DS_Store
+Thumbs.db
+
+# Archivos de VS Code
+# --------------------
+.vscode/
+# Excepción: Permitir el archivo de configuración del workspace si quieres compartirlo
+# !.vscode/settings.json
+# !.vscode/extensions.json
+# !.vscode/launch.json
+
+# Archivos de Prisma
+# --------------------
+# A veces se generan archivos de caché o locales
+# Mantener el schema.prisma y las migraciones
+!prisma/schema.prisma
+!prisma/migrations/
