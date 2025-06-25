@@ -42,12 +42,24 @@ erDiagram
   String bankName "nullable"
   String bankAccountNumber "nullable"
   String bankClabe UK "nullable"
-  Int administratorId FK,UK
+  Int administratorId FK
+  DateTime createdAt
+  DateTime updatedAt
+}
+"Property" {
+  Int id PK
+  PropertyType type
+  String identifier
+  String description "nullable"
+  Int condominiumId FK
+  Int ownerId FK "nullable"
   DateTime createdAt
   DateTime updatedAt
 }
 "User" }o--|| "Role" : role
-"Condominium" |o--|| "User" : administrator
+"Condominium" }o--|| "User" : administrator
+"Property" }o--|| "Condominium" : condominium
+"Property" }o--o| "User" : owner
 ```
 
 ### `User`
@@ -94,5 +106,18 @@ Properties as follows:
 - `bankAccountNumber`:
 - `bankClabe`:
 - `administratorId`:
+- `createdAt`:
+- `updatedAt`:
+
+### `Property`
+
+Properties as follows:
+
+- `id`:
+- `type`:
+- `identifier`:
+- `description`:
+- `condominiumId`:
+- `ownerId`:
 - `createdAt`:
 - `updatedAt`:

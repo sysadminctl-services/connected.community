@@ -7,11 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// === EDR generator ====
+// === ERD generator ====
 
 generator erd {
   provider = "prisma-erd-generator"
-  output   = "./ERD.png"
+  output   = "./ERD.svg"
+  theme = "neutral"
   puppeteerConfig = "./puppeteer-config.json"
 }
 
@@ -23,6 +24,13 @@ generator markdown {
 
 // === DATA MODELS ====
 
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  COMMERCIAL_SPACE
+  OTHER
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -32,7 +40,8 @@ model User {
   roleId    Int
   role      Role     @relation(fields: [roleId], references: [id])
 
-  administeredCondominium Condominium? @relation("administeredCondominium")
+  administeredCondominiums Condominium[] @relation("administeredCondominium")
+  ownedProperties         Property[]   @relation("Owner")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -78,9 +87,27 @@ model Condominium {
 
   // === Relations ===
   // Condominium managed by One Administrator
-  administratorId     Int     @unique
+  administratorId     Int
   administrator       User    @relation(name: "administeredCondominium", fields: [administratorId], references: [id])
+  
+  properties          Property[] @relation("Properties")
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+}
+
+model Property {
+  id             Int          @id @default(autoincrement())
+  type           PropertyType
+  identifier     String
+  description    String?
+
+  condominiumId  Int
+  condominium    Condominium  @relation("Properties", fields: [condominiumId], references: [id])
+
+  ownerId        Int?
+  owner          User?        @relation("Owner", fields: [ownerId], references: [id])
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
