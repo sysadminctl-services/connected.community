@@ -10,6 +10,7 @@ import {
 } from '@patternfly/react-core';
 import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import './LoginPage.css';
 import myAppLogo from '../assets/logo.svg';
 
@@ -18,14 +19,14 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
-      alert('¡Inicio de sesión exitoso! Token: ' + response.data.access_token);
+      await login(email, password);
     } catch (error) {
       alert('Error: Las credenciales son incorrectas.');
       console.error('Login failed:', error);
@@ -41,7 +42,7 @@ export function LoginPage() {
       brandImgAlt="connected.community logo"
 
       // --- Títulos y Textos Principales ---
-      loginTitle="Iniciar Sesión en connected.community"
+      loginTitle="Iniciar Sesión"
       loginSubtitle="Acceso al panel de administración de tu condominio."
 
       // --- Contenido del Panel Lateral ---
